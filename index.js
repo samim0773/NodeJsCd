@@ -47,6 +47,15 @@ app.patch("/products/:id", (req, res) => {
     res.status(201).json();
   });
 
+//   ------ delete DELETE /products/:id
+  app.delete("/products/:id", (req, res) => {
+    const id = +req.params.id; // here + conver string to number
+    const productIndex = products.findIndex((p) => p.id === id);
+    const product = products[productIndex];
+    products.splice(productIndex,1)
+    res.status(201).json(product);
+  });
+
 
 
 app.listen(8000, () => {
