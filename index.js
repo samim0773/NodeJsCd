@@ -9,6 +9,6 @@ app.use(express.json());
 app.use("/products", productRouter.router);
 app.use("/users", userRouter.router);
 
-app.listen(8000, () => {
+app.listen(process.env.PORT, () => {
   console.log("server is running on port 8000....");
 });
