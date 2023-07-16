@@ -1,40 +1,62 @@
-const fs = require("fs");
-const data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
-const users = data.users;
+const model = require("../models/users");
+const User = model.User;
 
-exports.createUser = (req, res) => {
-  const user = req.body;
-  users.push(user);
-  res.status(201).json(user);
+exports.createUser = async (req, res) => {
+  const user = new User(req.body);
+  try {
+    result = await user.save();
+    res.json(result);
+  } catch (err) {
+    res.status(400).json(err.message);
+  }
 };
 
-exports.getAllUsers = (req, res) => {
+exports.getAllUsers = async (req, res) => {
+  const users = await User.find();
   res.json(users);
 };
-exports.getUser = (req, res) => {
-  const id = +req.params.id; // here + conver string to number
-  const user = users.find((p) => p.id === id);
+
+exports.getUser = async (req, res) => {
+  const id = req.params.id; // here + conver string to number
+  const user = await User.findById(id);
   res.json(user);
 };
-exports.replaceUser = (req, res) => {
-  const id = +req.params.id; // here + conver string to number
-  const userIndex = users.findIndex((p) => p.id === id);
-  users.splice(userIndex, 1, { ...req.body, id: id });
-  res.status(201).json();
+
+exports.replaceUser = async (req, res) => {
+  const id = req.params.id; // here + conver string to number
+  try {
+    const doc = await User.findOneAndReplace(
+      { _id: id }, req.body, { new: true }
+    );
+    res.status(201).json(doc);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 };
 
-exports.updateUser = (req, res) => {
-  const id = +req.params.id; // here + conver string to number
-  const userIndex = users.findIndex((p) => p.id === id);
-  const user = users[userIndex];
-  users.splice(userIndex, 1, { ...user, ...req.body });
-  res.status(201).json();
+exports.updateUser = async (req, res) => {
+  const id = req.params.id; // here + conver string to number
+  try {
+    const doc = await User.findOneAndUpdate(
+      { _id: id }, req.body, { new: true }
+    );
+    res.status(201).json(doc);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 };
 
-exports.deleteUser = (req, res) => {
-  const id = +req.params.id; // here + conver string to number
-  const userIndex = users.findIndex((p) => p.id === id);
-  const user = users[userIndex];
-  users.splice(userIndex, 1);
-  res.status(201).json(user);
+exports.deleteUser = async (req, res) => {
+  const id = req.params.id; // here + conver string to number
+  try {
+    const doc = await User.findOneAndDelete(
+      { _id: id }
+    );
+    res.status(201).json(doc);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 };
